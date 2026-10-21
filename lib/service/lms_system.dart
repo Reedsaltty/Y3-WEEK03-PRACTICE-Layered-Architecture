@@ -1,12 +1,13 @@
 import '../model/course.dart';
 import '../model/student.dart';
 import 'package:lms_layered_architecture_example/model/course_result.dart';
+import 'package:lms_layered_architecture_example/model/assignment.dart';
 
 class LmsSystem {
   final List<Student> students = [];
   final List<Course> courses = [];
   final List<CourseResult> results = [];
-  // final List<Assignment> assignments =  [];
+  final List<Assignment> assignments =  [];
 
   LmsSystem();
 
@@ -124,6 +125,7 @@ class LmsSystem {
       {required String studentId,
       required String courseId,
       required String resultId,
+      required String assignmentId,
       required int score}) {
     Student? student = _findStudentOrNull(studentId);
     Course? course = _findCourseOrNull(courseId);
@@ -133,7 +135,7 @@ class LmsSystem {
       throw Exception('Course $courseId is not exist');
     }
     CourseResult result = CourseResult(
-        id: resultId, score: score, studentId: studentId, courseId: courseId);
+        id: resultId, score: score, studentId: studentId, courseId: courseId, assignmentId:assignmentId );
     results.add(result);
   }
 
@@ -146,5 +148,11 @@ class LmsSystem {
     print("Result$resultId : has been deleted");
   }
 
-  void addAssignmentToCourse(String courseId) {}
+  void addAssignmentToCourse({required String assignmentId,required String courseId,String? openDate,required String dueDate , STATUS status = STATUS.DRAFT, required }) {
+    Course? course = _findCourseOrNull(courseId);
+    if (course == null) {
+      throw Exception("The course with the id:$courseId does not exist");
+    }
+    Assignment newAssignment = Assignment(assignmentId: assignmentId, status: , openDate: openDate, dueDate: dueDate, , courseId: courseId)
+  }
 }

@@ -4,9 +4,8 @@ class Assignment {
   final String assignmentId;
   final STATUS status;
   final String dueDate;
+  final String openDate; 
 
-
-Assignment(this.assignmentId,this.status,this.dueDate){}
-
-
+  Assignment({ required this.assignmentId,required this.status,required this.openDate ,required this.dueDate
+     }) {}
 }
