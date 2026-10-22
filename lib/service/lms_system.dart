@@ -7,7 +7,7 @@ class LmsSystem {
   final List<Student> students = [];
   final List<Course> courses = [];
   final List<CourseResult> results = [];
-  final List<Assignment> assignments =  [];
+  final List<Assignment> assignments = [];
 
   LmsSystem();
 
@@ -48,9 +48,15 @@ class LmsSystem {
   void enrollStudentToCourse(String studentId, String courseId) {
     Student? student = _findStudentOrNull(studentId);
     Course? course = _findCourseOrNull(courseId);
+    int i = courses.indexWhere((c) => c.id == courseId);
+    if (courses[i].studentIdList.contains(studentId)) {
+      throw Exception("Student with ID $studentId already enroll");
+    }
+
     if (student == null) {
       throw Exception('Student $studentId is not exist');
-    } else if (course == null) {
+    }
+    if (course == null) {
       throw Exception('Course $courseId is not exist');
     }
     course.studentIdList.add(studentId);
@@ -59,16 +65,17 @@ class LmsSystem {
   void discardStudentFromCourse(String studentId, String courseId) {
     Student? student = _findStudentOrNull(studentId);
     Course? course = _findCourseOrNull(courseId);
+
     if (student == null) {
       throw Exception('Student $studentId is not exist');
-    } else if (course == null) {
+    }
+    if (course == null) {
       throw Exception('Course $courseId is not exist');
     }
-    for (var stu in course.studentIdList) {
-      if (stu == studentId) {
-        course.studentIdList.removeWhere((s) => s == studentId);
-      }
+    if (!course.studentIdList.contains(studentId)) {
+      throw Exception("Student with Id $studentId haven;t enroll yet");
     }
+    course.studentIdList.removeWhere((s) => s == studentId);
   }
 
   void addScore(
@@ -131,11 +138,16 @@ class LmsSystem {
     Course? course = _findCourseOrNull(courseId);
     if (student == null) {
       throw Exception('Student $studentId is not exist');
-    } else if (course == null) {
+    } 
+    if (course == null) {
       throw Exception('Course $courseId is not exist');
     }
     CourseResult result = CourseResult(
-        id: resultId, score: score, studentId: studentId, courseId: courseId, assignmentId:assignmentId );
+        id: resultId,
+        score: score,
+        studentId: studentId,
+        courseId: courseId,
+        assignmentId: assignmentId);
     results.add(result);
   }
 
@@ -148,11 +160,61 @@ class LmsSystem {
     print("Result$resultId : has been deleted");
   }
 
-  void addAssignmentToCourse({required String assignmentId,required String courseId,String? openDate,required String dueDate , STATUS status = STATUS.DRAFT, required }) {
+  Assignment? _findAssignmentOrNull(String assignmentId) {
+    for (Assignment asm in assignments) {
+      if (asm.Id == assignmentId) {
+        return asm;
+      }
+    }
+    return null;
+  }
+
+  bool isEnroll(String studentId, String courseId) {
+    bool res = courses
+        .any((c) => c.id == courseId && c.studentIdList.contains(studentId));
+    return res;
+  }
+
+  void addAssignmentToCourse(
+      {required String assignmentId,
+      required String courseId,
+      String? openDate,
+      required String dueDate,
+      STATUS status = STATUS.DRAFT,
+      required}) {
     Course? course = _findCourseOrNull(courseId);
+    Assignment? assignment = _findAssignmentOrNull(assignmentId);
+    final now = DateTime.now().toString();
+    if (assignment != null) {
+      throw Exception("The assignment with the $assignmentId is already exist");
+    }
     if (course == null) {
       throw Exception("The course with the id:$courseId does not exist");
     }
-    Assignment newAssignment = Assignment(assignmentId: assignmentId, status: , openDate: openDate, dueDate: dueDate, , courseId: courseId)
+    Assignment newAssignment = Assignment(
+        Id: assignmentId,
+        status: status,
+        openDate: openDate ?? now,
+        dueDate: dueDate,
+        courseId: courseId);
+
+    assignments.add(newAssignment);
+    course.assignments.add(newAssignment);
+    for (var c in course.studentIdList) {
+      int i = students.indexWhere((s) => s.id == c);
+      students[i].assignments.add(newAssignment);
+    }
+  }
+
+  List<Assignment> studentAssignment(String studentId) {
+    Student? student = _findStudentOrNull(studentId);
+
+    if (student == null) {
+      throw Exception('Student $studentId is not exist');
+    }
+
+    int i = students.indexWhere((s) => s.id == studentId);
+
+    return students[i].assignments;
   }
 }

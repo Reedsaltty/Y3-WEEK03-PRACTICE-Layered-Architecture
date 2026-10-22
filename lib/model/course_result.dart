@@ -1,5 +1,3 @@
-import 'package:lms_layered_architecture_example/model/course.dart';
-import 'package:lms_layered_architecture_example/model/student.dart';
 
 class CourseResult {
   final String id;
