@@ -136,11 +136,19 @@ class LmsSystem {
       required int score}) {
     Student? student = _findStudentOrNull(studentId);
     Course? course = _findCourseOrNull(courseId);
+    int i = courses.indexWhere((c) => c.id == courseId);
     if (student == null) {
       throw Exception('Student $studentId is not exist');
-    } 
+    }
     if (course == null) {
       throw Exception('Course $courseId is not exist');
+    }
+
+    if (!courses[i].studentIdList.contains(studentId)) {
+      throw Exception("Student is not enroll in course: ${course.name} ");
+    }
+    if (score < 0) {
+      throw Exception("Score can not be negative");
     }
     CourseResult result = CourseResult(
         id: resultId,

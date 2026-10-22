@@ -146,6 +146,7 @@ void main() {
     final lms = LmsSystem();
     lms.addStudent(studentId: "S1", studentName: "Darwin");
     lms.addCourse(courseId: "C1", courseName: "CS");
+    lms.enrollStudentToCourse("S1", "C1");
     lms.addAssignmentToCourse(
         assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10");
     lms.addResult(
@@ -158,57 +159,147 @@ void main() {
     expect(lms.results.length, 1);
   });
 
+  test("Reject a result for a nonexistent student", () {
+    final lms = LmsSystem();
+    lms.addCourse(courseId: "C1", courseName: "CS");
+    lms.addAssignmentToCourse(
+        assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10");
 
-    test("Reject a result for a nonexistent student", () {
-      final lms = LmsSystem();
-      lms.addCourse(courseId: "C1", courseName: "CS");
-      lms.addAssignmentToCourse(
-          assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10");
+    expect(
+        () => lms.addResult(
+            studentId: "S1",
+            courseId: "C1",
+            resultId: "R1",
+            assignmentId: "A1",
+            score: 100),
+        throwsException);
+  });
+  test('Reject a result for a nonexistent  course', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: "S1", studentName: "Darwin");
+    ;
 
-      expect(
-          () => lms.addResult(
-              studentId: "S1",
-              courseId: "C1",
-              resultId: "R1",
-              assignmentId: "A1",
-              score: 100),
-          throwsException);
-    });
-    test('Reject a result for a nonexistent  course', () {
-      final lms = LmsSystem();
-      lms.addStudent(studentId: "S1", studentName: "Darwin");
-      ;
+    expect(
+        () => lms.addAssignmentToCourse(
+            assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10"),
+        throwsException);
 
-      expect(
-          () =>lms.addAssignmentToCourse(
-          assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10"),throwsException) ;
-
-
-      expect(
-          () => lms.addResult(
-              studentId: "S1",
-              courseId: "C1",
-              resultId: "R1",
-              assignmentId: "A1",
-              score: 100),
-          throwsException);
-        
-    });
-  
+    expect(
+        () => lms.addResult(
+            studentId: "S1",
+            courseId: "C1",
+            resultId: "R1",
+            assignmentId: "A1",
+            score: 100),
+        throwsException);
+  });
 
   test(
       'Reject a result for a student who is not enrolled, if enrollment is required',
-      () {});
+      () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: "S1", studentName: "Darwin");
+    lms.addCourse(courseId: "C1", courseName: "CS");
+    lms.addAssignmentToCourse(
+        assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10");
 
-  test('Reject an invalid score', () {});
+    expect(
+        () => lms.addResult(
+            studentId: "S1",
+            courseId: "C1",
+            resultId: "R1",
+            assignmentId: "A1",
+            score: 100),
+        throwsException);
+  });
 
-  test('Remove an existing result', () {});
+  test('Reject an invalid score', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: "S1", studentName: "Darwin");
+    lms.addCourse(courseId: "C1", courseName: "CS");
+    lms.addAssignmentToCourse(
+        assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10");
+    lms.enrollStudentToCourse("S1", "C1");
 
-  test('Reject removal of a nonexistent result', () {});
+    expect(
+        () => lms.addResult(
+            studentId: "S1",
+            courseId: "C1",
+            resultId: "R1",
+            assignmentId: "A1",
+            score: -1),
+        throwsException);
+  });
 
-  test('Verify that the result is no longer available', () {});
+  test('Remove an existing result', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: "S1", studentName: "Darwin");
+    lms.addCourse(courseId: "C1", courseName: "CS");
+    lms.addAssignmentToCourse(
+        assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10");
+    lms.enrollStudentToCourse("S1", "C1");
+
+    lms.addResult(
+        studentId: "S1",
+        courseId: "C1",
+        resultId: "R1",
+        assignmentId: "A1",
+        score: 100);
+    lms.removeResult(resultId: "R1");
+    expect(lms.results.length, 0);
+  });
+
+  test('Reject removal of a nonexistent result', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: "S1", studentName: "Darwin");
+    lms.addCourse(courseId: "C1", courseName: "CS");
+    lms.addAssignmentToCourse(
+        assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10");
+    lms.enrollStudentToCourse("S1", "C1");
+    expect(() => lms.removeResult(resultId: "R1"), throwsException);
+  });
+
+  test('Verify that the result is no longer available', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: "S1", studentName: "Darwin");
+    lms.addCourse(courseId: "C1", courseName: "CS");
+    lms.addAssignmentToCourse(
+        assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10");
+    lms.enrollStudentToCourse("S1", "C1");
+    lms.addResult(
+        studentId: "S1",
+        courseId: "C1",
+        resultId: "R1",
+        assignmentId: "A1",
+        score: 100);
+
+    lms.removeResult(resultId: "R1");
+    expect(lms.results.isEmpty, true);
+  });
 
   test(
       'Verify that the student, course, and unrelated results remain unchanged',
-      () {});
+      () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: "S1", studentName: "Darwin");
+    lms.addCourse(courseId: "C1", courseName: "CS");
+    lms.addAssignmentToCourse(
+        assignmentId: "A1", courseId: "C1", dueDate: "2026-10-10");
+    lms.enrollStudentToCourse("S1", "C1");
+    lms.addResult(
+        studentId: "S1",
+        courseId: "C1",
+        resultId: "R1",
+        assignmentId: "A1",
+        score: 100);
+
+    lms.removeResult(resultId: "R1");
+    bool isOk = false;
+    if (lms.students.length == 1 &&
+        lms.courses.length == 1 &&
+        lms.results.length == 0) {
+      isOk = true;
+    }
+    expect(isOk, true);
+  });
 }
