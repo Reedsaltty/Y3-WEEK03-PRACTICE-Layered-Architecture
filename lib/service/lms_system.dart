@@ -49,15 +49,15 @@ class LmsSystem {
     Student? student = _findStudentOrNull(studentId);
     Course? course = _findCourseOrNull(courseId);
     int i = courses.indexWhere((c) => c.id == courseId);
-    if (courses[i].studentIdList.contains(studentId)) {
-      throw Exception("Student with ID $studentId already enroll");
-    }
-
+  
     if (student == null) {
       throw Exception('Student $studentId is not exist');
     }
     if (course == null) {
       throw Exception('Course $courseId is not exist');
+    }
+    if (courses[i].studentIdList.contains(studentId)) {
+      throw Exception("Student with ID $studentId already enroll");
     }
     course.studentIdList.add(studentId);
   }
